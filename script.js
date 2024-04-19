@@ -1,10 +1,15 @@
 $.fn.azeditor = function() {
   // Iterate over each textarea in the jQuery collection
+  index = 0;
   this.each(function() {
+    ++index;
     // Convert each textarea to your custom HTML editor
 
     var textarea = $(this);
     var nameArrribute = $(this).attr('name');
+    var text = $(this).text();
+    var id = $(this).attr('id');
+    var placeholder = $(this).attr('placeholder');
     
     // Your conversion logic here
     var customEditor = $(`
@@ -16,12 +21,12 @@ $.fn.azeditor = function() {
         File
       </button>
       <div class="dropdown-menu dropdown-menu-lg">
-        <a class="dropdown-item" href="#" onclick="newDocument()"><i class="fas fa-file-alt"></i> New Document</a>
-          <a class="dropdown-item" href="#" onclick="previewDocument()"><i class="fas fa-eye"></i> Preview</a>
-          <a class="dropdown-item clearfix" href="#" onclick="printDocument()">
+        <span class="dropdown-item cursor-pointer" onclick="newDocument(event)"><i class="fas fa-file-alt"></i> New Document</span>
+        <span class="dropdown-item cursor-pointer" onclick="previewDocument(event)"><i class="fas fa-eye"></i> Preview</span>
+        <span class="dropdown-item cursor-pointer clearfix" onclick="printDocument(this)">
           <span class="float-start"><i class="fas fa-print"></i> Print</span>
           <span class="float-end">Ctrl+P</span>
-        </a>
+        </span>
       </div>
     </div>
 
@@ -31,31 +36,31 @@ $.fn.azeditor = function() {
         Edit
       </button>
       <div class="dropdown-menu dropdown-menu-lg">
-        <a class="dropdown-item" href="#" onclick="execCommand('undo')"><i class="fas fa-undo"></i> Undo</a>
-        <a class="dropdown-item" href="#" onclick="execCommand('redo')"><i class="fas fa-redo"></i> Redo</a>
+        <button class="dropdown-item execCommand" href="#" data-command="undo" onclick="execCommand(event, null, 'undo')"><i class="fas fa-undo"></i> Undo</button>
+        <button class="dropdown-item execCommand" href="#" data-commandedo onclick="execCommand(event, null, 'redo')"><i class="fas fa-redo"></i> Redo</button>
         <div class="dropdown-divider"></div>
-        <a class="dropdown-item clearfix" href="#" onclick="execCommand('copy')">
+        <button class="dropdown-item clearfix execCommand" href="#" data-command="copy" onclick="execCommand(event, null, 'copy')">
           <span class="float-start"><i class="fas fa-copy"></i> Copy</span>
           <span class="float-end shortcut-key">Ctrl+C</span>
-        </a>
-        <a class="dropdown-item clearfix" href="#" onclick="execCommand('cut')">
+        </button>
+        <button class="dropdown-item clearfix execCommand" href="#" data-command="cut" onclick="execCommand(event, null, 'cut')">
           <span class="float-start"><i class="fas fa-cut"></i> Cut</span>
           <span class="float-end shortcut-key">Ctrl+X</span>
-        </a>
+        </button>
         <div class="dropdown-divider"></div>
-        <a class="dropdown-item clearfix" href="#" onclick="notSupportCommand()">
+        <button class="dropdown-item clearfix execCommand-" href="#" onclick="notSupportCommand()">
           <span class="float-start"><i class="fas fa-paste"></i> Paste</span>
           <span class="float-end shortcut-key">Ctrl+V</span>
-        </a>
-        <a class="dropdown-item clearfix" href="#" onclick="notSupportCommand()">
+        </button>
+        <button class="dropdown-item clearfix execCommand-" href="#" onclick="notSupportCommand()">
           <span class="float-start"><i class="fas fa-paste"></i> Paste Text</span>
           <span class="float-end shortcut-key">Ctrl+SHIFT+V</span>
-        </a>
+        </button>
         <div class="dropdown-divider"></div>
-        <a class="dropdown-item clearfix" href="#" onclick="execCommand('selectAll')">
+        <button class="dropdown-item clearfix execCommand" href="#" data-command="selectAll" onclick="execCommand(event, null, 'selectAll')">
           <span class="float-start"><i class="fas fa-mouse-pointer"></i> Select All</span>
           <span class="float-end shortcut-key">Ctrl+A</span>
-        </a>
+        </button>
         <!--a class="dropdown-item" href="#"><i class="fas fa-search"></i> Find and Replace</a-->
       </div>
     </div>
@@ -66,11 +71,10 @@ $.fn.azeditor = function() {
         View
       </button>
       <div class="dropdown-menu dropdown-menu-lg">
-        <a class="dropdown-item" href="#" onclick="toggleContent()" id="viewWhichMode">
+        <button class="dropdown-item" href="#" onclick="toggleContent()" id="viewWhichMode">
           <i class="fas fa-code"></i> Source
-        </a>
-        <a class="dropdown-item" href="#" onclick="toggleSourceView()"><i class="fas fa-eye"></i> Source Preview</a>
-        <!--a class="dropdown-item" href="#"><i class="fas fa-eye"></i> Preview</a-->
+        </button>
+        <button class="dropdown-item" href="#" onclick="toggleSourceView(event)"><i class="fas fa-eye"></i> Source Preview</button>
       </div>
     </div>
 
@@ -80,14 +84,14 @@ $.fn.azeditor = function() {
         Insert
       </button>
       <div class="dropdown-menu">
-        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#linkModal"><i class="fas fa-link"></i> Link</a>
-        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#imageModal"><i class="fas fa-image"></i> Image</a>
-        <!--a class="dropdown-item" href="#"><i class="fas fa-film"></i> Media</a-->
-        <!--a class="dropdown-item" href="#"><i class="fas fa-table"></i> Table</a-->
-        <!--a class="dropdown-item" href="#"><i class="fas fa-star"></i> Special Character</a-->
-        <a class="dropdown-item" href="#" onclick="insertHorizontalLine()"><i class="fas fa-minus"></i> Horizontal Line</a>
-        <!--a class="dropdown-item" href="#"><i class="fas fa-user"></i> Author</a-->
-        <!--a class="dropdown-item" href="#"><i class="fas fa-calendar-alt"></i> Datetime</a-->
+        <button class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#linkModal"><i class="fas fa-link"></i> Link</button>
+        <button class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#imageModal"><i class="fas fa-image"></i> Image</button>
+        <!--button class="dropdown-item" href="#"><i class="fas fa-film"></i> Media</button-->
+        <!--button class="dropdown-item" href="#"><i class="fas fa-table"></i> Table</button-->
+        <!--button class="dropdown-item" href="#"><i class="fas fa-star"></i> Special Character</button-->
+        <button class="dropdown-item" href="#" onclick="insertHorizontalLine(event)"><i class="fas fa-minus"></i> Horizontal Line</button>
+        <!--button class="dropdown-item" href="#"><i class="fas fa-user"></i> Author</button-->
+        <!--button class="dropdown-item" href="#"><i class="fas fa-calendar-alt"></i> Datetime</button-->
       </div>
     </div>
 
@@ -97,13 +101,13 @@ $.fn.azeditor = function() {
         Format
       </button>
       <div class="dropdown-menu">
-        <a class="dropdown-item" href="#" onclick="execCommand('bold')"><i class="fas fa-bold"></i> Bold</a>
-        <a class="dropdown-item" href="#" onclick="execCommand('italic')"><i class="fas fa-italic"></i> Italic</a>
-        <a class="dropdown-item" href="#" onclick="execCommand('underline')"><i class="fas fa-underline"></i> Underline</a>
-        <a class="dropdown-item" href="#" onclick="toggleSuperscript()"><i class="fas fa-superscript"></i> Superscript</a>
-        <a class="dropdown-item" href="#" onclick="toggleSubscript()"><i class="fas fa-subscript"></i> Subscript</a>
-        <a class="dropdown-item" href="#" onclick="execCommand('strikeThrough')"><i class="fas fa-strikethrough"></i> Strikethrough</a>
-        <!--a class="dropdown-item" href="#" onclick="ccc()"><i class="fas fa-eraser"></i> Clear Format</a-->					
+        <button class="dropdown-item execCommand" href="#" data-command="bold" onclick="execCommand(event, null, 'bold')"><i class="fas fa-bold"></i> Bold</button>
+        <button class="dropdown-item execCommand" href="#" data-command="italic" onclick="execCommand(event, null, 'italic')"><i class="fas fa-italic"></i> Italic</button>
+        <button class="dropdown-item execCommand" href="#" data-command="underline" onclick="execCommand(event, null, 'underline')"><i class="fas fa-underline"></i> Underline</button>
+        <button class="dropdown-item execCommand-" href="#" onclick="toggleSuperscript(event)"><i class="fas fa-superscript"></i> Superscript</button>
+        <button class="dropdown-item execCommand-" href="#" onclick="toggleSubscript(event)"><i class="fas fa-subscript"></i> Subscript</button>
+        <button class="dropdown-item execCommand" href="#" data-command="strikeThrough" onclick="execCommand(event, null, 'strikeThrough')"><i class="fas fa-strikethrough"></i> Strikethrough</button>
+        <!--button class="dropdown-item" href="#" onclick="ccc()"><i class="fas fa-eraser"></i> Clear Format</button-->					
       </div>
     </div>
 
@@ -113,10 +117,10 @@ $.fn.azeditor = function() {
         Tools
       </button>
       <div class="dropdown-menu">
-        <a class="dropdown-item" href="#"><i class="fas fa-table"></i> Table</a>
-        <a class="dropdown-item" href="#"><i class="fas fa-table-row"></i> Row</a>
-        <a class="dropdown-item" href="#"><i class="fas fa-table-column"></i> Column</a>
-        <a class="dropdown-item" href="#"><i class="fas fa-table-cell"></i> Cell</a>
+        <button class="dropdown-item" href="#"><i class="fas fa-table"></i> Table</button>
+        <button class="dropdown-item" href="#"><i class="fas fa-table-row"></i> Row</button>
+        <button class="dropdown-item" href="#"><i class="fas fa-table-column"></i> Column</button>
+        <button class="dropdown-item" href="#"><i class="fas fa-table-cell"></i> Cell</button>
       </div>
     </div-->
 
@@ -130,8 +134,8 @@ $.fn.azeditor = function() {
     
   <div class="btn-toolbar mb-2" role="toolbar">
     <div class="btn-group me-2">
-      <button type="button" class="btn btn-light" onclick="execCommand('undo')"><i class="fas fa-undo"></i></button>
-      <button type="button" class="btn btn-light" onclick="execCommand('redo')"><i class="fas fa-redo"></i></button>
+      <button type="button" class="btn btn-light execCommand" data-command="undo" onclick="execCommand(event, null, 'undo')"><i class="fas fa-undo"></i></button>
+      <button type="button" class="btn btn-light execCommand" data-command="redo" onclick="execCommand(event, null, 'redo')"><i class="fas fa-redo"></i></button>
     </div>
 
     <div class="btn-group me-2">
@@ -139,37 +143,37 @@ $.fn.azeditor = function() {
         Font Size
       </button>
       <div class="dropdown-menu">
-        <a class="dropdown-item" href="#" onclick="applyHeading('p')">Paragraph</a>
+        <button class="dropdown-item execCommand" href="#" data-command="formatBlock" data-command-value="p" -onclick="applyHeading( 'p')">Paragraph</button>
         <div class="dropdown-divider"></div>
-        <a class="dropdown-item" href="#" onclick="applyHeading('h1')"><h1>Heading 1</h1></a>
-        <a class="dropdown-item" href="#" onclick="applyHeading('h2')"><h2>Heading 2</h2></a>
-        <a class="dropdown-item" href="#" onclick="applyHeading('h3')"><h3>Heading 3</h3></a>
-        <a class="dropdown-item" href="#" onclick="applyHeading('h4')"><h4>Heading 4</h4></a>
-        <a class="dropdown-item" href="#" onclick="applyHeading('h5')"><h5>Heading 5</h5></a>
-        <a class="dropdown-item" href="#" onclick="applyHeading('h6')"><h6>Heading 6</h6></a>
+        <button class="dropdown-item execCommand" href="#" data-command="formatBlock" data-command-value="h1" -onclick="applyHeading( 'h1')"><h1>Heading 1</h1></button>
+        <button class="dropdown-item execCommand" href="#" data-command="formatBlock" data-command-value="h2" -onclick="applyHeading( 'h2')"><h2>Heading 2</h2></button>
+        <button class="dropdown-item execCommand" href="#" data-command="formatBlock" data-command-value="h3" -onclick="applyHeading( 'h3')"><h3>Heading 3</h3></button>
+        <button class="dropdown-item execCommand" href="#" data-command="formatBlock" data-command-value="h4" -onclick="applyHeading( 'h4')"><h4>Heading 4</h4></button>
+        <button class="dropdown-item execCommand" href="#" data-command="formatBlock" data-command-value="h5" -onclick="applyHeading( 'h5')"><h5>Heading 5</h5></button>
+        <button class="dropdown-item execCommand" href="#" data-command="formatBlock" data-command-value="h6" -onclick="applyHeading( 'h6')"><h6>Heading 6</h6></button>
       </div>
     </div>
 
     <div class="btn-group me-2">
-      <button type="button" class="btn btn-light" onclick="execCommand('bold')"><i class="fas fa-bold"></i></button>
-      <button type="button" class="btn btn-light" onclick="execCommand('italic')"><i class="fas fa-italic"></i></button>
-      <button type="button" class="btn btn-light" onclick="execCommand('underline')"><i class="fas fa-underline"></i></button>
+      <button type="button" class="btn btn-light execCommand" data-command="bold" onclick="execCommand(event, null, 'bold')"><i class="fas fa-bold"></i></button>
+      <button type="button" class="btn btn-light execCommand" data-command="italic" onclick="execCommand(event, null, 'italic')"><i class="fas fa-italic"></i></button>
+      <button type="button" class="btn btn-light execCommand" data-command="underline" onclick="execCommand(event, null, 'underline')"><i class="fas fa-underline"></i></button>
       <span class="btn btn-light p-1">
         <label for="textColorPicker" class="position-absolute" style="cursor:pointer;height:28px;width:48px;padding-top:5px;border-radius:2px; font-size:12px; font-weight:bold;background-color:#fff;">A</label>
-        <input type="color" id="textColorPicker" class="input-color" onchange="changeTextColor(this.value)">
+        <input type="color" id="textColorPicker" class="input-color" onchange="changeTextColor(event, this.value)">
       </span>
       <span class="btn btn-light p-1 positon-relative">
         <label for="backgroundColorPicker" class="position-absolute" style="cursor:pointer;top:11px;left:12px;height:15px;width:35px;border-radius:2px; font-size:12px; font-weight:bold;background-color:#fff;">A</label>
-        <input type="color" id="backgroundColorPicker" class="input-color" onchange="changeBackgroundColor(this.value)">
+        <input type="color" id="backgroundColorPicker" class="input-color" onchange="changeBackgroundColor(event,this.value)">
       </span>
-      <button type="button" class="btn btn-light" onclick="execCommand('justifyLeft')"><i class="fas fa-align-left"></i></button>
-      <button type="button" class="btn btn-light" onclick="execCommand('justifyCenter')"><i class="fas fa-align-center"></i></button>
-      <button type="button" class="btn btn-light" onclick="execCommand('justifyRight')"><i class="fas fa-align-right"></i></button>
-      <button type="button" class="btn btn-light" onclick="execCommand('justifyFull')"><i class="fas fa-align-justify"></i></button>
-      <button type="button" class="btn btn-light" onclick="execCommand('insertUnorderedList')"><i class="fas fa-list-ul"></i></button>
-      <button type="button" class="btn btn-light" onclick="execCommand('insertOrderedList')"><i class="fas fa-list-ol"></i></button>
-      <button type="button" class="btn btn-light" onclick="execCommand('indent')"><i class="fas fa-indent"></i></button>
-      <button type="button" class="btn btn-light" onclick="execCommand('outdent')"><i class="fas fa-outdent"></i></button>
+      <button type="button" class="btn btn-light execCommand" data-command="justifyLeft" onclick="execCommand(event, null, 'justifyLeft')"><i class="fas fa-align-left"></i></button>
+      <button type="button" class="btn btn-light execCommand" data-command="justifyCenter" onclick="execCommand(event, null, 'justifyCenter')"><i class="fas fa-align-center"></i></button>
+      <button type="button" class="btn btn-light execCommand" data-command="justifyRight" onclick="execCommand(event, null, 'justifyRight')"><i class="fas fa-align-right"></i></button>
+      <button type="button" class="btn btn-light execCommand" data-command="justifyFull" onclick="execCommand(event, null, 'justifyFull')"><i class="fas fa-align-justify"></i></button>
+      <button type="button" class="btn btn-light execCommand" data-command="insertUnorderedList" onclick="execCommand(event, null, 'insertUnorderedList')"><i class="fas fa-list-ul"></i></button>
+      <button type="button" class="btn btn-light execCommand" data-command="insertOrderedList" onclick="execCommand(event, null, 'insertOrderedList')"><i class="fas fa-list-ol"></i></button>
+      <button type="button" class="btn btn-light execCommand" data-command="indent" onclick="execCommand(event, null, 'indent')"><i class="fas fa-indent"></i></button>
+      <button type="button" class="btn btn-light execCommand" data-command="outdent" onclick="execCommand(event, null, 'outdent')"><i class="fas fa-outdent"></i></button>
     </div>
   </div>
 
@@ -178,8 +182,8 @@ $.fn.azeditor = function() {
       <span id="activeModeText" onclick="toggleContent()" class="tag text-dark">Editor Mode</span>
     </header>
     
-    <div class="editor bg-light p-3 shadow-none textarea" contenteditable="true" id="editor" oninput="updateTextarea()">abcdef</div>
-    <textarea name="${nameArrribute}" id="textarea" oninput="updateEditor()" class="textarea w-100" style="display:none;">abcdef</textarea>
+    <div class="editor bg-light p-3 shadow-none textarea editor" contenteditable="true" id="editor" oninput="updateTextarea(event)"></div>
+    <textarea name="${nameArrribute}" placeholder="${placeholder}" id="${id}" oninput="updateEditor(event)" data-index="${index}" class="textarea uniqueTextarea${index} w-100 maintextarea" style="display:none;">${text}</textarea>
     <div id="toasting" class="toasting"></div>
     
     <footer>
@@ -217,7 +221,7 @@ $.fn.azeditor = function() {
         </div>
         <div class="modal-footer border-0">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary" onclick="clearEditor()">New</button>
+          <button type="button" class="btn btn-primary" onclick="clearEditor(event)">New</button>
         </div>
       </div>
     </div>
@@ -303,7 +307,7 @@ $.fn.azeditor = function() {
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="insertImage()">Insert</button>
+          <button type="button" class="btn btn-primary" onclick="insertImage(event)">Insert</button>
         </div>
       </div>
     </div>
@@ -342,7 +346,7 @@ $.fn.azeditor = function() {
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="insertLink()">Insert Link</button>
+          <button type="button" class="btn btn-primary" onclick="insertLink(event)">Insert Link</button>
         </div>
       </div>
     </div>
@@ -374,34 +378,51 @@ $.fn.azeditor = function() {
 };
 
 
-
-
 document.addEventListener('DOMContentLoaded', function() {
   isHtmlVisible = false;
   let savedRange = 0;
+  selectedTextarea = 0; // 0  for none
 
-  editor = document.getElementById('editor');
-  textarea = document.getElementById('textarea');
-  activeModeText = document.getElementById('activeModeText');
+  mainContainerSelector = '#az-editor-container';
+  editorSelector = '.editor';
+  textareaSelector = '.maintextarea';
+  wordCountSelector = '#wordCount';
+  
+  
+  linkTextSelector = '#linkText';
+  linkUrlSelector = '#linkUrl';
+  linkTargetSelector = '#linkTarget';
 
-  viewWhichMode = document.getElementById('viewWhichMode');
+  editor = $(editorSelector); //document.getElementById('editor');
+  textarea = $(textareaSelector); //document.getElementById('textarea');
+  activeModeText = $('#activeModeText'); //document.getElementById('activeModeText');
+
+  viewWhichMode = $('#viewWhichMode'); //document.getElementById('viewWhichMode');
   viewWhichModeSource = '<i class="fas fa-code"></i> Source';
   viewWhichModeEditor = '<i class="fas fa-edit"></i> Editor';
 
 
-  var insertImageUrl = document.getElementById("imageUrlInput");
-  var insertImageUploadFile = document.getElementById("imageUploadInput");
-  var insertImageAlt = document.getElementById("imageAlt");
-  var insertImageHeight = document.getElementById("imageHeight");
-  var insertImageWidth = document.getElementById("imageWidth");
-    
-  countWordsElem = document.getElementById('wordCount');
+  var insertImageUrl = $('#imageUrlInput'); //document.getElementById("imageUrlInput");
+  var insertImageUploadFile = $('#imageUploadInput'); //document.getElementById("imageUploadInput");
+  var insertImageAlt = $('#imageAlt'); //document.getElementById("imageAlt");
+  var insertImageHeight = $('#imageHeight'); //document.getElementById("imageHeight");
+  var insertImageWidth = $('#imageWidth'); //document.getElementById("imageWidth");
+
 })
 
-function saveSelection() {
+function saveSelection(event) {
+  // editorSelector = $(event.target).closest(mainContainerSelector).find(editorSelector);
+  // selectedTextarea = editorSelector.attr('data-index');
+  // var selection = editorSelector.getSelection();
+  // if (selection.rangeCount > 0) {
+  //   savedRange = selection.getRangeAt(0);
+  // }
+  var editorSelector = $(event.target).closest(mainContainerSelector).find(editorSelector);
+  selectedTextarea = editorSelector.attr('data-index');
+  var editorElement = editorSelector[0];
   var selection = window.getSelection();
   if (selection.rangeCount > 0) {
-    savedRange = selection.getRangeAt(0);
+    var savedRange = selection.getRangeAt(0);
   }
 }
 
@@ -414,7 +435,10 @@ function getSelectionRange() {
   var selection = window.getSelection();
   if (selection.rangeCount > 0) {
     var range = selection.getRangeAt(0);
-    if (editor.contains(range.commonAncestorContainer)) {
+    // if (editor.contains(range.commonAncestorContainer)) {
+    //   return range;
+    // }
+    if (editor.is(range.commonAncestorContainer)) {
       return range;
     }
   }
@@ -427,46 +451,101 @@ function getSelectedText() {
 }
 
 function toggleContent() {
-  var textarea = document.getElementById('textarea');
-  var toggleButton = document.getElementById('toggleContentButton');
+  // var textarea = document.getElementById('textarea');
+  // var toggleButton = document.getElementById('toggleContentButton');
   if (isHtmlVisible) {
     // Show text content
-    editor.style.display = 'block';
-    textarea.style.display = 'none';
-    activeModeText.textContent = 'Editor Mode';
-    viewWhichMode.innerHTML = viewWhichModeSource;
+    editor.css('display', 'block');
+    textarea.css('display', 'none');
+    // editor.style.display = 'block';
+    // textarea.style.display = 'none';
+    activeModeText.text('Editor Mode');
+    viewWhichMode.html(viewWhichModeSource);
   } else {
-    editor.style.display = 'none';
-    textarea.style.display = 'block';
-    activeModeText.textContent = 'Source Mode';
-    viewWhichMode.innerHTML = viewWhichModeEditor;
+    editor.css('display', 'none');
+    textarea.css('display', 'block');
+    // editor.style.display = 'none';
+    // textarea.style.display = 'block';
+    activeModeText.text('Source Mode');
+    viewWhichMode.html(viewWhichModeEditor);
   }
   isHtmlVisible = !isHtmlVisible;
 }
 
-function updateTextarea() {
-  var editorContent = editor.innerHTML;
-  textarea.value = editorContent;
+function updateTextarea(event) {
+  $main = $(event.target).closest(mainContainerSelector);
+  var editorContent = $main.find(editorSelector).html();
+  $main.find(textareaSelector).val(editorContent);
   
-  countWords();
-  saveSelection();
+  countWords(event);
+  saveSelection(event);
 }
 
-function updateEditor() {
+function updateEditor(event) {
   // Get the content from the textarea
-  var textareaContent = textarea.value;
-  editor.innerHTML = textareaContent;
-  console.log(textareaContent);
-  
-  countWords();
-  saveSelection();
+  $main = $(event.target).closest(mainContainerSelector);
+  var textareaContent = $main.find(textareaSelector).val();
+  $main.find(editorSelector).html(textareaContent);
+  countWords(event);
+  saveSelection(event);
 }
 
 function ccc() {
   alert('no work');
 }
 
-function execCommand(command, value = null) {
+function setCursor(event, this_){
+  console.log('ss');
+  if(event){
+    $selector = $(event.target);
+  }else{
+    $selector = $(this_);
+  }
+
+  editorSelector = $selector.closest(mainContainerSelector).find('.textarea');
+  var editorElement = editorSelector[0];
+  editorElement.focus();
+  var range = document.createRange();
+  range.selectNodeContents(editorElement);
+  range.collapse(false);
+  var selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+
+}
+
+
+
+
+
+$(document).ready(function() {
+  $('.execCommand').click(function() {
+    command = $(this).attr('data-command');
+
+    if(command == 'formatBlock'){
+      value = $(this).attr('data-command-value');
+      applyHeading(value);
+    }else{
+      execCommand(null, this, command, value = null);
+    }
+  });
+});
+
+function execCommand(event, this_, command, value = null) {
+  console.log('e  sssssssssssssssssss1');
+  setCursor(event, this_);
+  if(event){
+    console.log('e 1');
+    target = $(event.target).closest(mainContainerSelector).find(editorSelector);
+    targetElement = target[0];
+  }else{
+    console.log('e 2');
+    target = $(this_).closest(mainContainerSelector).find(editorSelector);
+    targetElement = target[0];
+  }
+  console.log(targetElement);
+  
+  // targetElement.execCommand(command, false, value);
   document.execCommand(command, false, value);
 }
 
@@ -474,12 +553,12 @@ function notSupportCommand() {
   showToast("Use ctrl+v / ctrl+shift+p commands");
 }
 
-function toggleSubscript() {
+function toggleSubscript(event) {
   if(document.queryCommandState('subscript')){
-    execCommand('removeFormat');
+    execCommand(event, null, 'removeFormat');
     //document.execCommand('removeFormat', false, null);
   }else{
-    execCommand('subscript');
+    execCommand(event, null, 'subscript');
     //document.execCommand('subscript', false, null);
   }
   // var selection = window.getSelection();
@@ -488,16 +567,16 @@ function toggleSubscript() {
   // var subText = document.createElement('sub');
   // subText.textContent = selectedText;
   // range.deleteContents();
-// range.insertNode(subText);
+  // range.insertNode(subText);
 }
 
-function toggleSuperscript() {
+function toggleSuperscript(event) {
   if(document.queryCommandState('superscript')){
     // document.execCommand('removeFormat', false, null);
-    execCommand('removeFormat');
+    execCommand(event, null, 'removeFormat');
   }else{
     //document.execCommand('superscript', false, null);
-    execCommand('superscript');
+    execCommand(event, null, 'superscript');
   }
   // var selection = window.getSelection();
   // var range = selection.getRangeAt(0);
@@ -524,15 +603,15 @@ function convertToNormalText(startNode, endNode, text) {
 }
 
 
-function insertImage() {
-  var imageUrl = insertImageUrl.value.trim();
+function insertImage(event) {
+  var imageUrl = insertImageUrl.val().trim();
   //var fileInput = document.getElementById("imageUploadInput");
   console.log('ss ss');
 
   if (imageUrl !== "") {
     insertImageFromURL(imageUrl);
   } else if (insertImageUploadFile.files.length > 0) {
-    uploadAndInsertImage();
+    uploadAndinsertImage(event);
   } else {
     alert("Please enter an image URL or select an image file.");
   }
@@ -540,65 +619,65 @@ function insertImage() {
 
 function insertImageFromURL(){
 
-  var imageUrl = insertImageUrl.value.trim();
+  var imageUrl = insertImageUrl.val().trim();
 
   var range = getSelectionRange();
   if (range) {
     var img = document.createElement("img");
     img.src = imageUrl;
-    if(insertImageAlt.value){
-      img.alt = insertImageAlt.value;
+    if(insertImageAlt.val()){
+      img.alt = insertImageAlt.val();
     }
-    if(insertImageHeight.value){
-      img.height = insertImageHeight.value;
+    if(insertImageHeight.val()){
+      img.height = insertImageHeight.val();
     }
-    if(insertImageWidth.value){
-      img.width = insertImageWidth.value;
+    if(insertImageWidth.val()){
+      img.width = insertImageWidth.val();
     } 
     range.insertNode(img);
   } else {
     var img = document.createElement("img");
     img.src = imageUrl;
-    if(insertImageAlt.value){
-      img.alt = insertImageAlt.value;
+    if(insertImageAlt.val()){
+      img.alt = insertImageAlt.val();
     }
-    if(insertImageHeight.value){
-      img.height = insertImageHeight.value;
+    if(insertImageHeight.val()){
+      img.height = insertImageHeight.val();
     }
-    if(insertImageWidth.value){
-      img.width = insertImageWidth.value;
+    if(insertImageWidth.val()){
+      img.width = insertImageWidth.val();
     } 
     editor.appendChild(img);
   }
   $('#imageModal').modal('hide');
 }
 
-function uploadAndInsertImage() {
+function uploadAndinsertImage(event) {
   //var fileInput = document.getElementById('imageUploadInput');
   var file = insertImageUploadFile.files[0];
   console.log('s');
-    const FR = new FileReader();
-  
-    FR.addEventListener("load", function(evt) {
-      var img = document.createElement("img");
+  const FR = new FileReader();
+
+  FR.addEventListener("load", function(evt) {
+    var img = document.createElement("img");
     img.src = evt.target.result;
-    if(insertImageAlt.value){
-      img.alt = insertImageAlt.value;
+    if(insertImageAlt.val()){
+      img.alt = insertImageAlt.val();
     }
-    if(insertImageHeight.value){
-      img.height = insertImageHeight.value;
+    if(insertImageHeight.val()){
+      img.height = insertImageHeight.val();
     }
-    if(insertImageWidth.value){
-      img.width = insertImageWidth.value;
+    if(insertImageWidth.val()){
+      img.width = insertImageWidth.val();
     } 
     editor.appendChild(img);
   }); 
-  
+
   FR.readAsDataURL(file);
   $('#imageModal').modal('hide');
 }
 
-/*function insertImage(imageUrl) {
+/*function insertImage(eventimageUrl) {
   var editor = document.getElementById("editor");
   var range = getSelectionRange(editor);
   if (range) {
@@ -619,20 +698,30 @@ function uploadAndInsertImage() {
 }*/
 
 
-function insertLink() {
-  var linkText = document.getElementById("linkText").value;
-  var linkUrl = document.getElementById("linkUrl").value;
-  var linkTarget = document.getElementById("linkTarget").value;
+function insertLink(event) {
+  eventModal = $(event.target).closest('#linkModal');
+  var linkText = eventModal.find(linkTextSelector).val();
+  var linkUrl = eventModal.find(linkUrlSelector).val();
+  var linkTarget = eventModal.find(linkTargetSelector).val();
 
+  editorDiv = $(event.target).closest(mainContainerSelector).find(editorSelector);
   var selectedText = getSelectedText();
 
-  if (!selectedText && editor) {
+  if (!selectedText && editorDiv) {
+    // var range = document.createRange();
+    // range.selectNodeContents(editor);
+    // range.collapse(false); // Move range to the end
+    // var selection = window.getSelection();
+    // selection.removeAllRanges();
+    // selection.addRange(range);
+
+    $(editorDiv).append('<span id="selectedText"></span>');
     var range = document.createRange();
-    range.selectNodeContents(editor);
-    range.collapse(false); // Move range to the end
+    range.selectNode($('#selectedText')[0]);
     var selection = window.getSelection();
     selection.removeAllRanges();
     selection.addRange(range);
+    $('#selectedText').remove();
   }
 
   var range = getSelectionRange();
@@ -645,10 +734,10 @@ function insertLink() {
     range.deleteContents();
     range.insertNode(link);
   }
-  $('#linkModal').modal('hide')
+  eventModal.modal('hide')
 }
 
-function insertHorizontalLine() {
+function insertHorizontalLine(event) {
   var horizontalLine = document.createElement("hr");
   if (savedRange) {
     savedRange.deleteContents();
@@ -656,9 +745,7 @@ function insertHorizontalLine() {
   } else {
     document.getElementById("editor").appendChild(horizontalLine);
   }
-
 }
-
 
 
 function applyHeading(tagName) {
@@ -666,158 +753,178 @@ function applyHeading(tagName) {
     document.execCommand('formatBlock', false, tagName);
   //} else {
     // Fallback to manually wrapping the selection with the specified tag
-  //	var selection = window.getSelection();
-  //	var range = selection.getRangeAt(0);
-  //	var headingElement = document.createElement(tagName);
-  //	headingElement.textContent = selection.toString();
-  //	range.deleteContents();
-  //	range.insertNode(headingElement);
+    //	var selection = window.getSelection();
+    //	var range = selection.getRangeAt(0);
+    //	var headingElement = document.createElement(tagName);
+    //	headingElement.textContent = selection.toString();
+    //	range.deleteContents();
+    //	range.insertNode(headingElement);
   //}
 }
 
-function changeBackgroundColor(color) {
-        //document.execCommand('hiliteColor', false, color);
-  execCommand('hiliteColor');
-    }
+function changeBackgroundColor(event, color) {
+  //document.execCommand('hiliteColor', false, color);
+  execCommand(event, null, 'hiliteColor');
+}
 
-    function changeTextColor(color) {
-        //document.execCommand('foreColor', false, color);
-  execCommand('foreColor');
-    }
+function changeTextColor(event, color) {
+  //document.execCommand('foreColor', false, color);
+  execCommand(event, null, 'foreColor');
+}
 
 function showToast(message) {
-        var toast = document.getElementById('toasting');
-        toast.textContent = message;
-        toast.style.display = 'block';
+  var toast = document.getElementById('toasting');
+  toast.textContent = message;
+  toast.style.display = 'block';
 
-        // Hide the toast after 3 seconds
-        setTimeout(function() {
-            toast.style.display = 'none';
-        }, 3000);
-    }
+  // Hide the toast after 3 seconds
+  setTimeout(function() {
+      toast.style.display = 'none';
+  }, 3000);
+}
 
 //document.addEventListener('keydown', function(event) {
-    //    if (event.ctrlKey && event.key === 'p') {
-    //        event.preventDefault();
-    //        showToast('Your browser does not support Ctrl + P');
-    //    }
-    //});
+//    if (event.ctrlKey && event.key === 'p') {
+//        event.preventDefault();
+//        showToast('Your browser does not support Ctrl + P');
+//    }
+//});
 
-    function generateHtml() {
-        var editorContent = editor.innerHTML;
-        console.log(editorContent);
-        // You can now use editorContent as the HTML output
-        // For example, you can send it to a server, display it in a preview, etc.
-    }
+function generateHtml() {
+  var editorContent = editor.innerHTML;
+  console.log(editorContent);
+}
 
-    function newDocument() {
-        // Show Bootstrap modal for new document confirmation
+function newDocument(event) {
+  // Show Bootstrap modal for new document confirmation
   $(document).ready(function(){
-    $('#newDocumentModal').modal('show');
+    $(event.target).closest(mainContainerSelector).find('#newDocumentModal').modal('show');
   });
-    }
-
-
-function clearEditor() {
-  editor.innerHTML = '';
-  $('#newDocumentModal').modal('hide');
 }
 
 
-    function previewDocument() {
-        // Show Bootstrap modal for preview
-        $('#previewModal').modal('show');
-        // Display content in preview modal
-        document.getElementById('previewContent').innerHTML = editor.innerHTML;
-    }
-
-
-function alertMsg(msg){
-  $('#alertModal').find('.modal-body').text(msg);
-  $('#alertModal').modal('show');
+function clearEditor(event) {
+  $(event.target).closest(mainContainerSelector).find(editorSelector).html('');
+  $(event.target).closest(mainContainerSelector).find(textareaSelector).val('');
+  $(event.target).closest(mainContainerSelector).find('#newDocumentModal').modal('hide');
 }
 
-function printDocument() {
-    // Open print window with editor content
-    var editorContent = editor.innerHTML;
-    var printWindow = window.open('', '_blank');
-    printWindow.document.write('<html><head><title>Print Preview</title></head><body>' + editorContent + '</body></html>');
-    printWindow.document.close();
-    printWindow.print();
+function previewDocument(event) {
+  $(event.target).closest(mainContainerSelector).find('#previewModal').modal('show');
+  e = $(event.target).closest(mainContainerSelector).find(editorSelector);
+  $(event.target).closest(mainContainerSelector).find('#previewContent').html(e.html());
 }
 
-function toggleSourceView() {
-        var editorContent = editor.innerHTML;
-        var sourceModalBody = document.getElementById('sourceModalBody');
-        sourceModalBody.textContent = editorContent;
-        var sourceModal = new bootstrap.Modal(document.getElementById('sourceModal'));
-        sourceModal.toggle();
-    }
+function alertMsg(event, msg){
+  modal = $(event).closest(mainContainerSelector).find('#alertModal');
+  modal.find('.modal-body').text(msg);
+  modal.modal('show');
+}
 
-function countWords() {
-  var text = editor.innerText;
+function printDocument(this_) {
+  // Open print window with editor content
+  if(event){
+    $e = $(event.target);
+  }else{
+    $e = $(this_);
+  }
+
+  editor = $e.closest(mainContainerSelector).find(editorSelector);
+  var editorContent = editor.html();
+  console.log(editorContent);
+  var printWindow = window.open('', '_blank');
+  printWindow.document.write('<html><head><title>Print Preview</title></head><body>' + editorContent + '</body></html>');
+  printWindow.document.close();
+  printWindow.print();
+}
+
+function toggleSourceView(event) {
+  main = $(event.target).closest(mainContainerSelector);
+  var editorContent = main.find(editorSelector).html();
+  var sourceModalBody = main.find('#sourceModalBody');
+  sourceModalBody.textContent = editorContent;
+  main.find('#sourceModal').toggle();
+}
+
+function countWords(event) {
+  $main = $(event.target).closest(mainContainerSelector);
+  var text = $main.find(editorSelector).text();
   var wordCount = text.split(/\s+/).filter(function(word) {
     return word.length > 0;
   }).length;
-  countWordsElem.textContent = "Word Counts: " + wordCount;
+  $main.find(wordCountSelector).text("Word Counts: " + wordCount);
 }
 
 
-
-
 document.addEventListener('DOMContentLoaded', function() {
-// Add a 'paste' event listener to the editor
-editor.addEventListener('paste', function(event) {
-  
-  var clipboardData = event.clipboardData || window.clipboardData;
+  // Add a 'paste' event listener to the editor
+  // editor.addEventListener('paste', function(event) {
+  $(editor).on('paste', function(event) {
+    
+    var clipboardData = event.clipboardData || window.clipboardData;
 
-  if (clipboardData && clipboardData.items) {
-    for (var i = 0; i < clipboardData.items.length; i++) {
-      var item = clipboardData.items[i];
+    if (clipboardData && clipboardData.items) {
+      for (var i = 0; i < clipboardData.items.length; i++) {
+        var item = clipboardData.items[i];
 
-      if (item.type.indexOf('image') !== -1) {
-      event.preventDefault();
-        var fileReader = new FileReader();
-        var blob = item.getAsFile();
-        fileReader.onload = function(event) {
-          var imageElement = document.createElement('img');
-          imageElement.src = event.target.result;
-          editor.appendChild(imageElement);
-        };
-        fileReader.readAsDataURL(blob);
+        if (item.type.indexOf('image') !== -1) {
+        event.preventDefault();
+          var fileReader = new FileReader();
+          var blob = item.getAsFile();
+          fileReader.onload = function(event) {
+            var imageElement = document.createElement('img');
+            imageElement.src = event.target.result;
+            editor.appendChild(imageElement);
+          };
+          fileReader.readAsDataURL(blob);
+        }
       }
     }
-  }
-});
+  });
 
-// Add event listener for keyboard shortcuts
-editor.addEventListener('keydown', function(event) {
-  if ((event.ctrlKey || event.metaKey) && !event.shiftKey) {
-    event.preventDefault();
-    console.log(event.key.toLowerCase());
-    switch (event.key.toLowerCase()) {
-      case 's':
-        alertMsg('I can not save to draft, no work done');
-        break;
-      case 'n':
-        newDocument();
-        break;
-      case 'c':
-        execCommand('copy');
-        break;
-      case 'x':
-        execCommand('cut');
-        break;
-      case 'v':
-        execCommand('paste');
-        break;
-      case 'a':
-        execCommand('selectAll');
-        break;
-      case 'p':
-        printDocument();
-        break;
-      }
-  }
-});
+  // Add event listener for keyboard shortcuts
+  // editor.addEventListener('keydown', function(event) {
+  $(editor).on('keydown', function(event) {
+    if ((event.ctrlKey || event.metaKey) && !event.shiftKey) {
+      console.log(event.key.toLowerCase());
+      switch (event.key.toLowerCase()) {
+        case 's':
+          event.preventDefault();
+          alertMsg(this, 'I can not save to draft, no work done');
+          break;
+        case 'n':
+          event.preventDefault();
+          newDocument();
+          break;
+        // case 'c':
+        //   event.preventDefault();
+        //   execCommand(null, this, 'copy');
+        //   break;
+        // case 'x':
+        //   event.preventDefault();
+        //   execCommand(null, this, 'cut');
+        //   break;
+        // case 'v':
+        //   event.preventDefault();
+        //   execCommand(null, this, 'paste');
+        //   break;
+        // case 'a':
+        //   event.preventDefault();
+        //   execCommand(null, this, 'selectAll');
+        //   break;
+        // case 'y':
+        //   event.preventDefault();
+        //   execCommand(null, this, 'redo');
+        //   break;
+        // case 'z':
+        //   event.preventDefault();
+        //   execCommand(null, this, 'undo');
+        //   break;
+        case 'p':
+          event.preventDefault();
+          printDocument(this);
+          break;
+        }
+    }
+  });
 });

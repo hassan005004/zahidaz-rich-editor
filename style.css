@@ -1,64 +1,39 @@
 #az-editor-container .shortcut-key{font-size:12px;margin-top:2px;font-weight:bold}
+#az-editor-container .tag{background-color:#F1F1F1!important;font-size:12px;border-radius:15px;padding:5px 7px;color:#33333!important}
+#az-editor-container .btn-light{background-color:#F1F1F1;}
 		
-		#az-editor-container .tag{background-color:#F1F1F1!important;font-size:12px;border-radius:15px;padding:5px 7px;color:#33333!important}
-		
-		#az-editor-container .btn-light{background-color:#F1F1F1;}
-		
-        #az-editor-container {
-			position:relative;
-            border: 1px solid #ced4da;
-            border-radius: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-		#az-editor-container #editor, #az-editor-container #textarea{
-			min-height:300px;
-			background-color:#F1F1F1 !important;
-			padding: 20px;
-		}
+#az-editor-container {position:relative;border: 1px solid #ced4da;border-radius: 15px;box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
+#az-editor-container #editor, #az-editor-container #textarea{min-height:300px;background-color:#F1F1F1 !important;padding: 20px;}
 
-        /* Remove dropdown arrow */
-        #az-editor-container .btn-group>.btn.dropdown-toggle::after {
-            display: none;
-        }
-		#az-editor-container .dropdown-menu-lg {min-width: 200px;}
-		#az-editor-container .dropdown-menu .dropdown-item{font-size:15px !important;}
+/* Remove dropdown arrow */
+#az-editor-container .btn-group>.btn.dropdown-toggle::after {display: none;}
+#az-editor-container .dropdown-menu-lg {min-width: 200px;}
+#az-editor-container .dropdown-menu .dropdown-item{font-size:15px !important;}
+		
+#az-editor-container .rounded-0px{border-radius:0px !important}
+#az-editor-container .btn-toolbar-first .btn-light{background-color:#ffffff; border-width:0px;}
+#az-editor-container .btn-toolbar-first .btn{padding:3px; margin-right:20px;}
+#az-editor-container .input-color{border:none; border-radius:5px; height:100%;cursor:pointer}
 
+#az-editor-container header{font-weight:500;margin-bottom:10px}
+#az-editor-container header #activeModeText{cursor:pointer;}
+#az-editor-container footer{margin-top:10px;}
+
+#az-editor-container .textarea:focus {outline: none !important;}
+#az-editor-container .textarea{padding:10px !important;}
+#az-editor-container .textarea,
+#az-editor-container .textarea#editor:active {border: none !important;border-radius:15px;}
 		
-		#az-editor-container .rounded-0px{border-radius:0px !important}
-		#az-editor-container .btn-toolbar-first .btn-light{background-color:#ffffff; border-width:0px;}
-		#az-editor-container .btn-toolbar-first .btn{padding:3px; margin-right:20px;}
-		#az-editor-container .input-color{border:none; border-radius:5px; height:100%;cursor:pointer}
+#az-editor-container .toasting{position: absolute;top: 10px;left: 50%;transform: translateX(-50%);background-color: #FF5500;color: #fff;padding: 10px 20px;border-radius: 5px;z-index: 9999;display: none;}
 		
-		#az-editor-container header{font-weight:500;margin-bottom:10px}
-		#az-editor-container header #activeModeText{cursor:pointer;}
-		#az-editor-container footer{margin-top:10px;}
-		
-		
-		#az-editor-container .textarea:focus {outline: none !important;}
-		#az-editor-container .textarea{padding:10px !important;}
-		#az-editor-container .textarea,
-		#az-editor-container .textarea#editor:active {border: none !important;border-radius:15px;}
-		
-		#az-editor-container .toasting{
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #FF5500;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 5px;
-            z-index: 9999;
-            display: none;
-        }
-		
-		/*modal css*/
-		#az-editor-container .modal.inside{overflow-y:hidden;position: absolute;top: 50% !important;left: 50% !important;transform: translate(-50%, -50%) !important;}
-		#az-editor-container .modal.inside .modal-content{max-height: calc(100% - 50px);}
-		#az-editor-container .modal.inside .modal-content .modal-body{overflow-y:auto}
-		#az-editor-container .modal.full{overflow:hidden}
-		#az-editor-container .modal .modal-content{border-radius:15px}
-		#az-editor-container .modal.full{width: 100%;max-width: 100vw;margin: 0;}
-		#az-editor-container .modal.full .modal-dialog {height: 100vh;max-width:100vw;margin:0px;}
-		#az-editor-container .modal.full .modal-content {height: calc(100% - 142px);overflow:auto;}
-		
+/*modal css*/
+#az-editor-container .modal.inside{overflow-y:hidden;position: absolute;top: 50% !important;left: 50% !important;transform: translate(-50%, -50%) !important;}
+#az-editor-container .modal.inside .modal-content{max-height: calc(100% - 50px);}
+#az-editor-container .modal.inside .modal-content .modal-body{overflow-y:auto}
+#az-editor-container .modal.full{overflow:hidden}
+#az-editor-container .modal .modal-content{border-radius:15px}
+#az-editor-container .modal.full{width: 100%;max-width: 100vw;margin: 0;}
+#az-editor-container .modal.full .modal-dialog {height: 100vh;max-width:100vw;margin:0px;}
+#az-editor-container .modal.full .modal-content {height: calc(100% - 142px);overflow:auto;}
+
+#az-editor-container .cursor-pointer{cursor:pointer}
