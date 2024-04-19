@@ -2,6 +2,7 @@ $.fn.azeditor = function() {
   // Iterate over each textarea in the jQuery collection
   this.each(function() {
     // Convert each textarea to your custom HTML editor
+
     var textarea = $(this);
     var nameArrribute = $(this).attr('name');
     
@@ -184,7 +185,7 @@ $.fn.azeditor = function() {
     <footer>
       <div class="text-end">
       <span id="wordCount" class="me-1 tag text-dark">Word Counts: 0</span>
-      <a href="https://zahidaz.com" class="text-decoration-none tag text-dark" target="_blank">Powered by zahidaz.com</a></div>
+      <a href="https://hassan005004.github.io/zahidaz-rich-editor" class="text-decoration-none tag text-dark" target="_blank">Powered by zahidaz</a></div>
     </footer>
   </div>
 
@@ -375,28 +376,27 @@ $.fn.azeditor = function() {
 
 
 
+document.addEventListener('DOMContentLoaded', function() {
+  isHtmlVisible = false;
+  let savedRange = 0;
 
-isHtmlVisible = false;
-let savedRange = 0;
+  editor = document.getElementById('editor');
+  textarea = document.getElementById('textarea');
+  activeModeText = document.getElementById('activeModeText');
+
+  viewWhichMode = document.getElementById('viewWhichMode');
+  viewWhichModeSource = '<i class="fas fa-code"></i> Source';
+  viewWhichModeEditor = '<i class="fas fa-edit"></i> Editor';
 
 
-editor = document.getElementById('editor');
-textarea = document.getElementById('textarea');
-activeModeText = document.getElementById('activeModeText');
-
-viewWhichMode = document.getElementById('viewWhichMode');
-viewWhichModeSource = '<i class="fas fa-code"></i> Source';
-viewWhichModeEditor = '<i class="fas fa-edit"></i> Editor';
-
-
-var insertImageUrl = document.getElementById("imageUrlInput");
-var insertImageUploadFile = document.getElementById("imageUploadInput");
-var insertImageAlt = document.getElementById("imageAlt");
-var insertImageHeight = document.getElementById("imageHeight");
-var insertImageWidth = document.getElementById("imageWidth");
-  
-countWordsElem = document.getElementById('wordCount');
-
+  var insertImageUrl = document.getElementById("imageUrlInput");
+  var insertImageUploadFile = document.getElementById("imageUploadInput");
+  var insertImageAlt = document.getElementById("imageAlt");
+  var insertImageHeight = document.getElementById("imageHeight");
+  var insertImageWidth = document.getElementById("imageWidth");
+    
+  countWordsElem = document.getElementById('wordCount');
+})
 
 function saveSelection() {
   var selection = window.getSelection();
@@ -466,13 +466,13 @@ function ccc() {
   alert('no work');
 }
 
-    function execCommand(command, value = null) {
-        document.execCommand(command, false, value);
-    }
+function execCommand(command, value = null) {
+  document.execCommand(command, false, value);
+}
 
 function notSupportCommand() {
-        showToast("Use ctrl+v / ctrl+shift+p commands");
-    }
+  showToast("Use ctrl+v / ctrl+shift+p commands");
+}
 
 function toggleSubscript() {
   if(document.queryCommandState('subscript')){
@@ -482,16 +482,16 @@ function toggleSubscript() {
     execCommand('subscript');
     //document.execCommand('subscript', false, null);
   }
-       // var selection = window.getSelection();
-       // var range = selection.getRangeAt(0);
-       // var selectedText = range.toString();
-       // var subText = document.createElement('sub');
-       // subText.textContent = selectedText;
-       // range.deleteContents();
-       // range.insertNode(subText);
-    }
+  // var selection = window.getSelection();
+  // var range = selection.getRangeAt(0);
+  // var selectedText = range.toString();
+  // var subText = document.createElement('sub');
+  // subText.textContent = selectedText;
+  // range.deleteContents();
+// range.insertNode(subText);
+}
 
-    function toggleSuperscript() {
+function toggleSuperscript() {
   if(document.queryCommandState('superscript')){
     // document.execCommand('removeFormat', false, null);
     execCommand('removeFormat');
@@ -500,36 +500,33 @@ function toggleSubscript() {
     execCommand('superscript');
   }
   // var selection = window.getSelection();
-        // var range = selection.getRangeAt(0);
-        // var selectedText = range.toString();
+  // var range = selection.getRangeAt(0);
+  // var selectedText = range.toString();
 
-        // if (range.commonAncestorContainer.parentNode.tagName === 'SUP') {
-        //    convertToNormalText(range.startContainer, range.endContainer, selectedText);
-        // } else {
-        //    var supText = document.createElement('sup');
-        //    supText.textContent = selectedText;
-        //    range.deleteContents();
-        //    range.insertNode(supText);
-        //}
-    }
+  // if (range.commonAncestorContainer.parentNode.tagName === 'SUP') {
+  //    convertToNormalText(range.startContainer, range.endContainer, selectedText);
+  // } else {
+  //    var supText = document.createElement('sup');
+  //    supText.textContent = selectedText;
+  //    range.deleteContents();
+  //    range.insertNode(supText);
+  //}
+}
 
 
-    function convertToNormalText(startNode, endNode, text) {
-        var range = document.createRange();
-        range.setStartBefore(startNode);
-        range.setEndAfter(endNode);
-        range.deleteContents();
-        var textNode = document.createTextNode(text);
-        range.insertNode(textNode);
-    }
+function convertToNormalText(startNode, endNode, text) {
+  var range = document.createRange();
+  range.setStartBefore(startNode);
+  range.setEndAfter(endNode);
+  range.deleteContents();
+  var textNode = document.createTextNode(text);
+  range.insertNode(textNode);
+}
 
 
 function insertImage() {
   var imageUrl = insertImageUrl.value.trim();
   //var fileInput = document.getElementById("imageUploadInput");
-  
-
-
   console.log('ss ss');
 
   if (imageUrl !== "") {
@@ -539,7 +536,6 @@ function insertImage() {
   } else {
     alert("Please enter an image URL or select an image file.");
   }
-  
 }
 
 function insertImageFromURL(){
@@ -621,6 +617,7 @@ function uploadAndInsertImage() {
     editor.appendChild(img);
   }
 }*/
+
 
 function insertLink() {
   var linkText = document.getElementById("linkText").value;
@@ -766,6 +763,9 @@ function countWords() {
 }
 
 
+
+
+document.addEventListener('DOMContentLoaded', function() {
 // Add a 'paste' event listener to the editor
 editor.addEventListener('paste', function(event) {
   
@@ -819,4 +819,5 @@ editor.addEventListener('keydown', function(event) {
         break;
       }
   }
+});
 });
