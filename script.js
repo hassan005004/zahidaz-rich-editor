@@ -13,7 +13,7 @@ $.fn.azeditor = function() {
     
     // Your conversion logic here
     var customEditor = $(`
-<div class="container mt-3 pt-2 pb-3" id="az-editor-container">
+<div class="container-fluid mt-3 p-3" id="az-editor-container">
   <div class="btn-toolbar btn-toolbar-first mb-0" role="toolbar">
     <!-- File dropdown -->
     <div class="btn-group">
