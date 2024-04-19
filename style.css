@@ -1,7 +1,7 @@
 #az-editor-container .shortcut-key{font-size:12px;margin-top:2px;font-weight:bold}
 #az-editor-container .tag{background-color:#F1F1F1!important;font-size:12px;border-radius:15px;padding:5px 7px;color:#33333!important}
 #az-editor-container .btn-light{background-color:#F1F1F1;}
-#az-editor-container .btn, #az-editor-container .btn-light{box-shadow:none;}
+#az-editor-container .btn, #az-editor-container .btn-light{box-shadow:none !important;}
 		
 #az-editor-container {position:relative;border: 1px solid #ced4da;border-radius: 15px;box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
 #az-editor-container #editor, #az-editor-container #textarea{min-height:300px;background-color:#F1F1F1 !important;padding: 20px;}
