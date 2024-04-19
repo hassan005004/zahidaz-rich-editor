@@ -182,7 +182,7 @@ $.fn.azeditor = function() {
       <span id="activeModeText" onclick="toggleContent()" class="tag text-dark">Editor Mode</span>
     </header>
     
-    <div class="editor bg-light p-3 shadow-none textarea editor" contenteditable="true" id="editor" oninput="updateTextarea(event)"></div>
+    <div class="editor bg-light p-3 shadow-none textarea editor" contenteditable="true" id="editor" oninput="updateTextarea(event)">${text}</div>
     <textarea name="${nameArrribute}" placeholder="${placeholder}" id="${id}" oninput="updateEditor(event)" data-index="${index}" class="textarea uniqueTextarea${index} w-100 maintextarea" style="display:none;">${text}</textarea>
     <div id="toasting" class="toasting"></div>
     
