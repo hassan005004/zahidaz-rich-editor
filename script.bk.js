@@ -71,7 +71,7 @@ $.fn.azeditor = function() {
         View
       </button>
       <div class="dropdown-menu dropdown-menu-lg">
-        <button type="button" class="dropdown-item" href="#" onclick="toggleContent(event)" id="viewWhichMode">
+        <button type="button" class="dropdown-item" href="#" onclick="toggleContent()" id="viewWhichMode">
           <i class="fas fa-code"></i> Source
         </button>
         <button type="button" class="dropdown-item" href="#" onclick="toggleSourceView(event)"><i class="fas fa-eye"></i> Source Preview</button>
@@ -157,8 +157,7 @@ $.fn.azeditor = function() {
     <div class="btn-group me-2">
       <button type="button" class="btn btn-light execCommand" data-command="bold" onclick="execCommand(event, null, 'bold')"><i class="fas fa-bold"></i></button>
       <button type="button" class="btn btn-light execCommand" data-command="italic" onclick="execCommand(event, null, 'italic')"><i class="fas fa-italic"></i></button>
-      <button type="button" class="btn btn-light execCommand" data-command="underline" onclick="execCommand(event, null, 'underline')"><i class="fas fa-underline"></i></button>
-      <button type="button" class="btn btn-light execCommandInserHtml" data-command="insertHTML" data-command-value="code"><i class="fas fa-code"></i></button>
+      <button type="button" class="btn btn-light execCommand" data-command="underline" -onclick="execCommand(event, null, 'underline')"><i class="fas fa-underline"></i></button>
       <span class="btn btn-light p-1">
         <label for="textColorPicker" class="position-absolute" style="cursor:pointer;height:28px;width:48px;padding-top:5px;border-radius:2px; font-size:12px; font-weight:bold;background-color:#fff;">A</label>
         <input type="color" id="textColorPicker" class="input-color" onchange="changeTextColor(event, this.value)">
@@ -180,7 +179,7 @@ $.fn.azeditor = function() {
 
   <div class="position-relative">
     <header style="margin-top:10px;display:block;">
-      <span id="activeModeText" onclick="toggleContent(event)" class="tag text-dark">Editor Mode</span>
+      <span id="activeModeText" onclick="toggleContent()" class="tag text-dark">Editor Mode</span>
     </header>
     
     <div class="editor bg-light p-3 shadow-none textarea editor" contenteditable="true" id="editor" oninput="updateTextarea(event)">${text}</div>
@@ -378,169 +377,409 @@ $.fn.azeditor = function() {
   return this;
 };
 
-mainContainerSelector = '#az-editor-container';
-editorSelector = '.editor';
-textareaSelector = '.maintextarea';
-wordCountSelector = '#wordCount';
 
-linkTextSelector = '#linkText';
-linkUrlSelector = '#linkUrl';
-linkTargetSelector = '#linkTarget';
+document.addEventListener('DOMContentLoaded', function() {
+  isHtmlVisible = false;
+  let savedRange = 0;
+  selectedTextarea = 0; // 0  for none
+
+  mainContainerSelector = '#az-editor-container';
+  editorSelector = '.editor';
+  textareaSelector = '.maintextarea';
+  wordCountSelector = '#wordCount';
+  
+  linkTextSelector = '#linkText';
+  linkUrlSelector = '#linkUrl';
+  linkTargetSelector = '#linkTarget';
+
+  editor = $(editorSelector); //document.getElementById('editor');
+  textarea = $(textareaSelector); //document.getElementById('textarea');
+  activeModeText = $('#activeModeText'); //document.getElementById('activeModeText');
+
+  viewWhichMode = $('#viewWhichMode'); //document.getElementById('viewWhichMode');
+  viewWhichModeSource = '<i class="fas fa-code"></i> Source';
+  viewWhichModeEditor = '<i class="fas fa-edit"></i> Editor';
 
 
-viewWhichModeSourceHtml = '<i class="fas fa-code"></i> Source';
-viewWhichModeEditorHtml = '<i class="fas fa-edit"></i> Editor';
+  var insertImageUrl = $('#imageUrlInput'); //document.getElementById("imageUrlInput");
+  var insertImageUploadFile = $('#imageUploadInput'); //document.getElementById("imageUploadInput");
+  var insertImageAlt = $('#imageAlt'); //document.getElementById("imageAlt");
+  var insertImageHeight = $('#imageHeight'); //document.getElementById("imageHeight");
+  var insertImageWidth = $('#imageWidth'); //document.getElementById("imageWidth");
 
-$(document).ready(function() {
-  $('.execCommand').click(function() {
-    command = $(this).attr('data-command');
-    if(command == 'formatBlock'){
-      value = $(this).attr('data-command-value');
-      applyHeading(value);
-    }else{
-      execCommand(command, value = null);
-    }
-  });
+  saveSelet
+})
 
-  $('.execCommandInserHtml').click(function(event) {
-    // command = $(this).attr('data-command');
-    // tag = $(this).attr('data-command-value');
-    // textareaSelector
-    // editorSelector
-    $this = $(event.target).closest(mainContainerSelector).find(editorSelector);
-    
-    var selection = window.getSelection();
-    var selectedText = selection.toString();
-    
-    if (selectedText.length > 0) {
-      var range = selection.getRangeAt(0);
-      var newNode = document.createElement("span");
-      newNode.innerHTML = "<pre><code>" + selectedText + "</pre></code>";
-      
-      range.deleteContents();
-      range.insertNode(newNode);
-    } else {
-      var textContentBeforeAppend = $this.text();
+function saveSelection(event) {
+  // editorSelector = $(event.target).closest(mainContainerSelector).find(editorSelector);
+  // selectedTextarea = editorSelector.attr('data-index');
+  // var selection = editorSelector.getSelection();
+  // if (selection.rangeCount > 0) {
+  //   savedRange = selection.getRangeAt(0);
+  // }
 
-      // Append the &nbsp;
-      $this.append("<span><pre><code>&nbsp;</code></pre></span>");
-      
-      // Update textarea and editor (assuming these are functions you have defined elsewhere)
-      updateTextarea(event);
-      updateEditor(event);
-      $this.focus();
-      el = $this[0];
-      setCaretAtStartEnd(el, true);
-    }
 
-    updateTextarea(event);
-  });
-});
-
-function setCaretAtStartEnd( node, atEnd ){
-  const sel = document.getSelection();
-  node = node.lastChild;
-
-  if( sel.rangeCount ){
-      ['Start', 'End'].forEach(pos =>
-        sel.getRangeAt(0)["set" + pos](node, atEnd ? node.length : 0)
-      )
+  var editorSelector = $(event.target).closest(mainContainerSelector).find(editorSelector);
+  selectedTextarea = editorSelector.attr('data-index');
+  var editorElement = editorSelector[0];
+  var selection = window.getSelection();
+  if (selection.rangeCount > 0) {
+    var savedRange = selection.getRangeAt(0);
   }
 }
 
-function execCommand(command, value = null) {
-  document.execCommand(command, false, value);
+function getSelectionRange() {
+  //var selection = window.getSelection();
+  //if (selection.rangeCount > 0) {
+  //	return selection.getRangeAt(0);
+  //}
+  //return null;
+  var selection = window.getSelection();
+  if (selection.rangeCount > 0) {
+    var range = selection.getRangeAt(0);
+    // if (editor.contains(range.commonAncestorContainer)) {
+    //   return range;
+    // }
+    if (editor.is(range.commonAncestorContainer)) {
+      return range;
+    }
+  }
+  return null;
 }
 
-function applyHeading(tagName) {
-  document.execCommand('formatBlock', false, tagName);
+function getSelectedText() {
+  var selection = window.getSelection();
+  return selection.toString();
 }
 
-function notSupportCommand() {
-  showToast("Use ctrl+v / ctrl+shift+p commands");
+function toggleContent() {
+  // var textarea = document.getElementById('textarea');
+  // var toggleButton = document.getElementById('toggleContentButton');
+  if (isHtmlVisible) {
+    // Show text content
+    editor.css('display', 'block');
+    textarea.css('display', 'none');
+    // editor.style.display = 'block';
+    // textarea.style.display = 'none';
+    activeModeText.text('Editor Mode');
+    viewWhichMode.html(viewWhichModeSource);
+  } else {
+    editor.css('display', 'none');
+    textarea.css('display', 'block');
+    // editor.style.display = 'none';
+    // textarea.style.display = 'block';
+    activeModeText.text('Source Mode');
+    viewWhichMode.html(viewWhichModeEditor);
+  }
+  isHtmlVisible = !isHtmlVisible;
 }
 
 function updateTextarea(event) {
   $main = $(event.target).closest(mainContainerSelector);
   var editorContent = $main.find(editorSelector).html();
   $main.find(textareaSelector).val(editorContent);
+  
   countWords(event);
+  saveSelection(event);
 }
 
-
 function updateEditor(event) {
+  // Get the content from the textarea
   $main = $(event.target).closest(mainContainerSelector);
   var textareaContent = $main.find(textareaSelector).val();
   $main.find(editorSelector).html(textareaContent);
   countWords(event);
+  saveSelection(event);
+}
+
+function ccc() {
+  alert('no work');
+}
+
+function setCursor(event, this_){
+  console.log('ss');
+  if(event){
+    $selector = $(event.target);
+  }else{
+    $selector = $(this_);
+  }
+
+  editorSelector = $selector.closest(mainContainerSelector).find('.textarea');
+  var editorElement = editorSelector[0];
+  editorElement.focus();
+  var range = document.createRange();
+  range.selectNodeContents(editorElement);
+  range.collapse(false);
+  var selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+
 }
 
 
-function countWords(event) {
-  $main = $(event.target).closest(mainContainerSelector);
-  var text = $main.find(editorSelector).text();
-  var wordCount = text.split(/\s+/).filter(function(word) {
-    return word.length > 0;
-  }).length;
-  $main.find(wordCountSelector).text("Word Counts: " + wordCount);
-}
+$(document).ready(function() {
+  $('.execCommand').click(function() {
+    command = $(this).attr('data-command');
 
-function newDocument(event) {
-  // Show Bootstrap modal for new document confirmation
-  $(document).ready(function(){
-    $(event.target).closest(mainContainerSelector).find('#newDocumentModal').modal('show');
+    if(command == 'formatBlock'){
+      value = $(this).attr('data-command-value');
+      applyHeading(value);
+    }else{
+      execCommand(null, this, command, value = null);
+    }
   });
-}
+});
 
-function clearEditor(event) {
-  $(event.target).closest(mainContainerSelector).find(editorSelector).html('');
-  $(event.target).closest(mainContainerSelector).find(textareaSelector).val('');
-  $(event.target).closest(mainContainerSelector).find('#newDocumentModal').modal('hide');
-}
-
-function previewDocument(event) {
-  $(event.target).closest(mainContainerSelector).find('#previewModal').modal('show');
-  e = $(event.target).closest(mainContainerSelector).find(editorSelector);
-  $(event.target).closest(mainContainerSelector).find('#previewContent').html(e.html());
-}
-
-function printDocument(this_) {
-  $e = $(this_);
-  editor = $e.closest(mainContainerSelector).find(editorSelector);
-  var editorContent = editor.html();
-  console.log(editorContent);
-  var printWindow = window.open('', '_blank');
-  printWindow.document.write('<html><head><title>Print Preview</title></head><body>' + editorContent + '</body></html>');
-  printWindow.document.close();
-  printWindow.print();
-}
-
-function toggleContent(event) {
-  $this = $(event.target).closest(mainContainerSelector);
-
-  // var textarea = document.getElementById('textarea');
-  // var toggleButton = document.getElementById('toggleContentButton');
-  console.log($this.find(editorSelector).css('display'));
-  if ($this.find(editorSelector).css('display') === 'none') {
-    // Show text content
-    $this.find(editorSelector).css('display', 'block');
-    $this.find(textareaSelector).css('display', 'none');
-    $this.find('#activeModeText').text('Editor Mode');
-    $this.find('#viewWhichMode').html(viewWhichModeSourceHtml);
+function execCommand(event, this_, command, value = null) {
+  console.log('e  sssssssssssssssssss1');
+  setCursor(event, this_);
+  if(event){
+    // console.log('e 1');
+    target = $(event.target).closest(mainContainerSelector).find(editorSelector);
+    targetElement = target[0];
+  }else{
+    // console.log('e 2');
+    target = $(this_).closest(mainContainerSelector).find(editorSelector);
+    targetElement = target[0];
+  }
+  console.log(11);
+  var selection = window.getSelection(); //targetElement.ownerDocument.defaultView.getSelection();
+  console.log(selection);
+  if (selection && selection.rangeCount > 0 && selection.toString().trim() !== '') {
+    // Text is selected
+    var selectedText = selection.toString();
+    console.log("Selected text: ", selectedText);
   } else {
-    $this.find(editorSelector).css('display', 'none');
-    $this.find(textareaSelector).css('display', 'block');
-    $this.find('#activeModeText').text('Source Mode');
-    $this.find('#viewWhichMode').html(viewWhichModeEditorHtml);
+    console.log("No text selected.");
+  }
+
+  // console.log(targetElement);
+  
+  // targetElement.execCommand(command, false, value);
+  document.execCommand(command, false, value);
+}
+
+function notSupportCommand() {
+  showToast("Use ctrl+v / ctrl+shift+p commands");
+}
+
+function toggleSubscript(event) {
+  if(document.queryCommandState('subscript')){
+    execCommand(event, null, 'removeFormat');
+    //document.execCommand('removeFormat', false, null);
+  }else{
+    execCommand(event, null, 'subscript');
+    //document.execCommand('subscript', false, null);
+  }
+  // var selection = window.getSelection();
+  // var range = selection.getRangeAt(0);
+  // var selectedText = range.toString();
+  // var subText = document.createElement('sub');
+  // subText.textContent = selectedText;
+  // range.deleteContents();
+  // range.insertNode(subText);
+}
+
+function toggleSuperscript(event) {
+  if(document.queryCommandState('superscript')){
+    // document.execCommand('removeFormat', false, null);
+    execCommand(event, null, 'removeFormat');
+  }else{
+    //document.execCommand('superscript', false, null);
+    execCommand(event, null, 'superscript');
+  }
+  // var selection = window.getSelection();
+  // var range = selection.getRangeAt(0);
+  // var selectedText = range.toString();
+
+  // if (range.commonAncestorContainer.parentNode.tagName === 'SUP') {
+  //    convertToNormalText(range.startContainer, range.endContainer, selectedText);
+  // } else {
+  //    var supText = document.createElement('sup');
+  //    supText.textContent = selectedText;
+  //    range.deleteContents();
+  //    range.insertNode(supText);
+  //}
+}
+
+
+function convertToNormalText(startNode, endNode, text) {
+  var range = document.createRange();
+  range.setStartBefore(startNode);
+  range.setEndAfter(endNode);
+  range.deleteContents();
+  var textNode = document.createTextNode(text);
+  range.insertNode(textNode);
+}
+
+
+function insertImage(event) {
+  var imageUrl = insertImageUrl.val().trim();
+  //var fileInput = document.getElementById("imageUploadInput");
+  console.log('ss ss');
+
+  if (imageUrl !== "") {
+    insertImageFromURL(imageUrl);
+  } else if (insertImageUploadFile.files.length > 0) {
+    uploadAndinsertImage(event);
+  } else {
+    alert("Please enter an image URL or select an image file.");
   }
 }
 
-function toggleSourceView(event) {
-  $this = $(event.target).closest(mainContainerSelector);
-  var editorContent = $this.find(editorSelector).html();
-  var sourceModalBody = $this.find('#sourceModalBody');
-  sourceModalBody.html(editorContent);
-  $this.find('#sourceModal').modal('show');
+function insertImageFromURL(){
+
+  var imageUrl = insertImageUrl.val().trim();
+
+  var range = getSelectionRange();
+  if (range) {
+    var img = document.createElement("img");
+    img.src = imageUrl;
+    if(insertImageAlt.val()){
+      img.alt = insertImageAlt.val();
+    }
+    if(insertImageHeight.val()){
+      img.height = insertImageHeight.val();
+    }
+    if(insertImageWidth.val()){
+      img.width = insertImageWidth.val();
+    } 
+    range.insertNode(img);
+  } else {
+    var img = document.createElement("img");
+    img.src = imageUrl;
+    if(insertImageAlt.val()){
+      img.alt = insertImageAlt.val();
+    }
+    if(insertImageHeight.val()){
+      img.height = insertImageHeight.val();
+    }
+    if(insertImageWidth.val()){
+      img.width = insertImageWidth.val();
+    } 
+    editor.appendChild(img);
+  }
+  $('#imageModal').modal('hide');
+}
+
+function uploadAndinsertImage(event) {
+  //var fileInput = document.getElementById('imageUploadInput');
+  var file = insertImageUploadFile.files[0];
+  console.log('s');
+  const FR = new FileReader();
+
+  FR.addEventListener("load", function(evt) {
+    var img = document.createElement("img");
+    img.src = evt.target.result;
+    if(insertImageAlt.val()){
+      img.alt = insertImageAlt.val();
+    }
+    if(insertImageHeight.val()){
+      img.height = insertImageHeight.val();
+    }
+    if(insertImageWidth.val()){
+      img.width = insertImageWidth.val();
+    } 
+    editor.appendChild(img);
+  }); 
+
+  FR.readAsDataURL(file);
+  $('#imageModal').modal('hide');
+}
+
+/*function insertImage(eventimageUrl) {
+  var editor = document.getElementById("editor");
+  var range = getSelectionRange(editor);
+  if (range) {
+    var img = document.createElement("img");
+    img.src = imageUrl;
+    img.alt = "Image";
+
+    // Insert the image at the current cursor position
+    range.insertNode(img);
+  } else {
+    // If no text is selected, append the image at the end of the editor
+    var img = document.createElement("img");
+    img.src = imageUrl;
+    img.alt = "Image";
+
+    editor.appendChild(img);
+  }
+}*/
+
+
+function insertLink(event) {
+  eventModal = $(event.target).closest('#linkModal');
+  var linkText = eventModal.find(linkTextSelector).val();
+  var linkUrl = eventModal.find(linkUrlSelector).val();
+  var linkTarget = eventModal.find(linkTargetSelector).val();
+
+  editorDiv = $(event.target).closest(mainContainerSelector).find(editorSelector);
+  var selectedText = getSelectedText();
+
+  if (!selectedText && editorDiv) {
+    // var range = document.createRange();
+    // range.selectNodeContents(editor);
+    // range.collapse(false); // Move range to the end
+    // var selection = window.getSelection();
+    // selection.removeAllRanges();
+    // selection.addRange(range);
+
+    $(editorDiv).append('<span id="selectedText"></span>');
+    var range = document.createRange();
+    range.selectNode($('#selectedText')[0]);
+    var selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    $('#selectedText').remove();
+  }
+
+  var range = getSelectionRange();
+  if (range) {
+    var link = document.createElement("a");
+    link.href = linkUrl;
+    link.textContent = linkText;
+    link.target = linkTarget;
+
+    range.deleteContents();
+    range.insertNode(link);
+  }
+  eventModal.modal('hide')
+}
+
+function insertHorizontalLine(event) {
+  var horizontalLine = document.createElement("hr");
+  if (savedRange) {
+    savedRange.deleteContents();
+    savedRange.insertNode(horizontalLine);
+  } else {
+    document.getElementById("editor").appendChild(horizontalLine);
+  }
+}
+
+
+function applyHeading(tagName) {
+  //if (document.queryCommandSupported('formatBlock')) {
+    document.execCommand('formatBlock', false, tagName);
+  //} else {
+    // Fallback to manually wrapping the selection with the specified tag
+    //	var selection = window.getSelection();
+    //	var range = selection.getRangeAt(0);
+    //	var headingElement = document.createElement(tagName);
+    //	headingElement.textContent = selection.toString();
+    //	range.deleteContents();
+    //	range.insertNode(headingElement);
+  //}
+}
+
+function changeBackgroundColor(event, color) {
+  //document.execCommand('hiliteColor', false, color);
+  execCommand(event, null, 'hiliteColor');
+}
+
+function changeTextColor(event, color) {
+  //document.execCommand('foreColor', false, color);
+  execCommand(event, null, 'foreColor');
 }
 
 function showToast(message) {
@@ -554,35 +793,148 @@ function showToast(message) {
   }, 3000);
 }
 
-$(document).on('keydown', function(event) {
-  if ((event.ctrlKey || event.metaKey) && !event.shiftKey) {
-    $this = $(event.target).closest(mainContainerSelector);
-    switch (event.key.toLowerCase()) {
-      case 's':
-        event.preventDefault();
-        alertMsg($this, 'I can not save to draft, no work done');
-        break;
-      case 'n':
-        event.preventDefault();
-        newDocument();
-        break;
-      case 'p':
-        event.preventDefault();
-        printDocument($this);
-        break;
-    }
+//document.addEventListener('keydown', function(event) {
+//    if (event.ctrlKey && event.key === 'p') {
+//        event.preventDefault();
+//        showToast('Your browser does not support Ctrl + P');
+//    }
+//});
+
+function generateHtml() {
+  var editorContent = editor.innerHTML;
+  console.log(editorContent);
+}
+
+function newDocument(event) {
+  // Show Bootstrap modal for new document confirmation
+  $(document).ready(function(){
+    $(event.target).closest(mainContainerSelector).find('#newDocumentModal').modal('show');
+  });
+}
+
+
+function clearEditor(event) {
+  $(event.target).closest(mainContainerSelector).find(editorSelector).html('');
+  $(event.target).closest(mainContainerSelector).find(textareaSelector).val('');
+  $(event.target).closest(mainContainerSelector).find('#newDocumentModal').modal('hide');
+}
+
+function previewDocument(event) {
+  $(event.target).closest(mainContainerSelector).find('#previewModal').modal('show');
+  e = $(event.target).closest(mainContainerSelector).find(editorSelector);
+  $(event.target).closest(mainContainerSelector).find('#previewContent').html(e.html());
+}
+
+function alertMsg(event, msg){
+  modal = $(event).closest(mainContainerSelector).find('#alertModal');
+  modal.find('.modal-body').text(msg);
+  modal.modal('show');
+}
+
+function printDocument(this_) {
+  // Open print window with editor content
+  if(event){
+    $e = $(event.target);
+  }else{
+    $e = $(this_);
   }
-  // $(event.target).closest(mainContainerSelector).find('#previewModal').modal('show');
+
+  editor = $e.closest(mainContainerSelector).find(editorSelector);
+  var editorContent = editor.html();
+  console.log(editorContent);
+  var printWindow = window.open('', '_blank');
+  printWindow.document.write('<html><head><title>Print Preview</title></head><body>' + editorContent + '</body></html>');
+  printWindow.document.close();
+  printWindow.print();
+}
+
+function toggleSourceView(event) {
+  main = $(event.target).closest(mainContainerSelector);
+  var editorContent = main.find(editorSelector).html();
+  var sourceModalBody = main.find('#sourceModalBody');
+  sourceModalBody.textContent = editorContent;
+  main.find('#sourceModal').toggle();
+}
+
+function countWords(event) {
+  $main = $(event.target).closest(mainContainerSelector);
+  var text = $main.find(editorSelector).text();
+  var wordCount = text.split(/\s+/).filter(function(word) {
+    return word.length > 0;
+  }).length;
+  $main.find(wordCountSelector).text("Word Counts: " + wordCount);
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Add a 'paste' event listener to the editor
+  // editor.addEventListener('paste', function(event) {
+  $(editor).on('paste', function(event) {
+    
+    var clipboardData = event.clipboardData || window.clipboardData;
+
+    if (clipboardData && clipboardData.items) {
+      for (var i = 0; i < clipboardData.items.length; i++) {
+        var item = clipboardData.items[i];
+
+        if (item.type.indexOf('image') !== -1) {
+        event.preventDefault();
+          var fileReader = new FileReader();
+          var blob = item.getAsFile();
+          fileReader.onload = function(event) {
+            var imageElement = document.createElement('img');
+            imageElement.src = event.target.result;
+            editor.appendChild(imageElement);
+          };
+          fileReader.readAsDataURL(blob);
+        }
+      }
+    }
+  });
+
+  // Add event listener for keyboard shortcuts
+  // editor.addEventListener('keydown', function(event) {
+  $(editor).on('keydown', function(event) {
+    if ((event.ctrlKey || event.metaKey) && !event.shiftKey) {
+      console.log(event.key.toLowerCase());
+      switch (event.key.toLowerCase()) {
+        case 's':
+          event.preventDefault();
+          alertMsg(this, 'I can not save to draft, no work done');
+          break;
+        case 'n':
+          event.preventDefault();
+          newDocument();
+          break;
+        // case 'c':
+        //   event.preventDefault();
+        //   execCommand(null, this, 'copy');
+        //   break;
+        // case 'x':
+        //   event.preventDefault();
+        //   execCommand(null, this, 'cut');
+        //   break;
+        // case 'v':
+        //   event.preventDefault();
+        //   execCommand(null, this, 'paste');
+        //   break;
+        // case 'a':
+        //   event.preventDefault();
+        //   execCommand(null, this, 'selectAll');
+        //   break;
+        // case 'y':
+        //   event.preventDefault();
+        //   execCommand(null, this, 'redo');
+        //   break;
+        // case 'z':
+        //   event.preventDefault();
+        //   execCommand(null, this, 'undo');
+        //   break;
+        case 'p':
+          event.preventDefault();
+          printDocument(this);
+          break;
+        }
+    }
+  });
 });
-
-// $(document).on('keydown', function(event) {
-//   if (event.keyCode === 13) {
-//     $this = $(event.target).closest(mainContainerSelector).find(textareaSelector);
-//     var textareaContent = $this.val();
-
-//     textareaContent = textareaContent.replace(/(<pre><br><\/pre>|<pre><\/pre>)[^<]*$/, '<pre>New content here</pre>');
-//     $this.val(textareaContent);
-
-//     updateTextarea(event);
-//   }
-// });
