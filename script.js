@@ -415,7 +415,7 @@ $(document).ready(function() {
     if (selectedText.length > 0) {
       var range = selection.getRangeAt(0);
       var newNode = document.createElement("span");
-      newNode.innerHTML = "<pre><code>" + selectedText + "</pre></code>";
+      newNode.innerHTML = "<pre><code>" + encodeHTMLTags(selectedText) + "</pre></code>";
       
       range.deleteContents();
       range.insertNode(newNode);
@@ -554,6 +554,13 @@ function showToast(message) {
   }, 3000);
 }
 
+function encodeHTMLTags(htmlSnippet) {
+  // Replace all occurrences of '<' with '&lt;'
+  var encodedSnippet = htmlSnippet.replace(/</g, '&lt;');
+  // Replace all occurrences of '>' with '&gt;'
+  encodedSnippet = encodedSnippet.replace(/>/g, '&gt;');
+  return encodedSnippet;
+}
 $(document).on('keydown', function(event) {
   if ((event.ctrlKey || event.metaKey) && !event.shiftKey) {
     $this = $(event.target).closest(mainContainerSelector);
