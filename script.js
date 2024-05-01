@@ -5,7 +5,26 @@ $.fn.azeditor = function() {
     ++index;
     // Convert each textarea to your custom HTML editor
 
+    var style = '';
+    var height;
+
     var textarea = $(this);
+    var rows = $("textarea").prop("rows");
+
+    if(rows){
+      var computedStyle = window.getComputedStyle(textarea[0]);
+      var fontSize = parseFloat(computedStyle.fontSize);
+      var lineHeight = parseFloat(computedStyle.lineHeight);
+      height = fontSize * lineHeight * rows;
+      style += `height:${height}px !important`;
+    }else{
+      height = textarea.height();
+      if(height){
+        style += `height:${height}px !important`;
+      }
+    }
+    
+    
     var nameArrribute = $(this).attr('name');
     var text = $(this).text();
     var id = $(this).attr('id');
@@ -183,9 +202,11 @@ $.fn.azeditor = function() {
       <span id="activeModeText" onclick="toggleContent(event)" class="tag text-dark">Editor Mode</span>
     </header>
     
-    <div class="editor bg-light p-3 shadow-none textarea editor" contenteditable="true" id="editor" oninput="updateTextarea(event)">${text}</div>
-    <textarea name="${nameArrribute}" placeholder="${placeholder}" id="${id}" oninput="updateEditor(event)" data-index="${index}" class="textarea uniqueTextarea${index} w-100 maintextarea" style="display:none;">${text}</textarea>
+    <div class="textarea-parent">
+    <div class="editor bg-light p-3 shadow-none textarea" contenteditable="true" id="editor" oninput="updateTextarea(event)" style="${style}">${text}</div>
+    <textarea name="${nameArrribute}" placeholder="${placeholder}" id="${id}" oninput="updateEditor(event)" data-index="${index}" class="textarea uniqueTextarea${index} w-100 maintextarea" style="display:none;${style}">${text}</textarea>
     <div id="toasting" class="toasting"></div>
+    </div>
     
     <footer>
       <div class="text-end">
