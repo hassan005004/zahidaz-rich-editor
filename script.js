@@ -9,13 +9,14 @@ $.fn.azeditor = function() {
     var height;
 
     var textarea = $(this);
-    var rows = $("textarea").prop("rows");
-
+    
+    var rows = textarea.prop("rows");
     if(rows){
       var computedStyle = window.getComputedStyle(textarea[0]);
       var fontSize = parseFloat(computedStyle.fontSize);
-      var lineHeight = parseFloat(computedStyle.lineHeight);
-      height = fontSize * lineHeight * rows;
+      // var lineHeight = parseFloat(computedStyle.lineHeight);
+      // height = fontSize * lineHeight * rows;
+      height = fontSize * rows;
       style += `height:${height}px !important`;
     }else{
       height = textarea.height();
